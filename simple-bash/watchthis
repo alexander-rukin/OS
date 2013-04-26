@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ "$#" == 0 ]; then
+	echo -e "Usage: `basename $0` [time in seconds] [command]"
+	exit
+fi
+
+timer="$1"
+shift 1
+process="$@"
+
+before=`$process`
+
+while true; do
+	sleep $timer
+	after=`$process`
+	echo "$after"
+	show="$( diff -u <(echo "$before") <(echo "$after") )"
+	if [ "$show" ]; then
+		echo "$show"
+	fi
+	before="$after"
+done

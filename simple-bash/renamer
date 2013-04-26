@@ -1,0 +1,37 @@
+#!/bin/bash
+
+ZERO=0
+E_NO_ARGUMENTS=65
+
+if [ "$#" -eq "$ZERO" ]
+then
+    echo -e "Usage: `basename $0` [filename(s)]"
+    exit $E_NO_ARGUMENTS
+fi
+
+for filename in "$@"
+do
+    if [ -f "$filename" ]
+    then
+        dirname=$(dirname "$filename")
+        if [ -w "$dirname" ]
+        then
+            basename=$(basename "$filename")
+            echo -n "old name: \""$basename"\"; new name: "
+            read newbasename
+            if [ -n "$newbasename" ]
+            then
+                if [ -e "$dirname/$newbasename" ]
+                then
+                    echo "File with this name just exist. Try again later."
+                else
+                    mv "$dirname/$basename" "$dirname/$newbasename"
+                fi
+            else
+                echo "File not renamed."
+            fi
+        else
+            echo "No rights to rename file: \""$filename"\""
+        fi
+    fi
+done

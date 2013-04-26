@@ -1,0 +1,31 @@
+#!/bin/bash
+
+ZERO=0
+E_BADARGS=65
+shopt -s nullglob
+if [ "$#" -eq "$ZERO" ]
+then
+    echo "Usage: `basename "$0"` [files or directories]"
+    exit $E_BADARGS
+fi
+
+checkLink () {
+    for arg in `echo "$@"`
+    do
+        arg=${arg/%\//}
+        if [ -d "$arg" ]
+        then
+            checkLink "$arg"/*
+        else
+            if [ -h "$arg" -a ! -e "$arg" ]
+            then
+                echo "$arg"
+            fi
+        fi
+    done 
+}
+
+for arg in "$@"
+do
+    checkLink "$arg"
+done

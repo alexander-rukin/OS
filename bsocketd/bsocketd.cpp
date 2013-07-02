@@ -223,15 +223,20 @@ int main (int argc, char** argv) {
             if (fd[i].revents & POLLOUT) {
                 if (q.empty(fd[i].fd) && write_buffers[i - 1] == "")
                     continue;
+            
                 if (write_buffers[i - 1] == "") {
-                    std::string mes = q.get(fd[i].fd);
-                    write_buffers[i - 1] = mes;
+                     std::string mes = q.get(fd[i].fd);
+                     write_buffers[i - 1] = mes;
                 }
                 int write_count = write(fd[i].fd, 
-                        (write_buffers[i - 1]).c_str(), 
-                        write_buffers[i - 1].length());
-                write_buffers[i - 1] = write_buffers[i - 1].substr(write_count);
+                    (write_buffers[i - 1]).c_str(), 
+                    write_buffers[i - 1].length());
+                write_buffers[i - 1] =  write_buffers[i - 1].substr(write_count);
             }
+            if (!q.empty(fd[i].fd))
+                fd[i].events |= POLLOUT;
+            else
+                fd[i].events &= (~POLLOUT);
         }
 	    if (fd[0].revents & POLLIN) {
             sockaddr_in client;
@@ -248,6 +253,7 @@ int main (int argc, char** argv) {
             std::cout << "New client #" << fd[clients].fd << std::endl;
             clients += 1;
 	    }
+
     }
     return 0;
 }
